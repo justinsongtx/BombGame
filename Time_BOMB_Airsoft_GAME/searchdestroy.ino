@@ -19,8 +19,20 @@ void search() {
 
     //Code for led blinking
     timeCalcVar = (millis() - iTime) % 1000;
-    if (timeCalcVar >= 0 && timeCalcVar <= 50)digitalWrite(GREENLED, HIGH);
-    if (timeCalcVar >= 90 && timeCalcVar <= 130)digitalWrite(GREENLED, LOW);
+    if (timeCalcVar >= 0 && timeCalcVar <= 50)
+    {
+      digitalWrite(GREENLED, HIGH);
+      
+      Serial.print("timeCalcVar >= 0 && timeCalcVar <= 50, timeCalcVar =");
+      Serial.println(timeCalcVar);
+    }
+    else if (timeCalcVar >= 90 && timeCalcVar <= 130)
+    {
+      digitalWrite(GREENLED, LOW);
+      
+      Serial.print("timeCalcVar >= 90 && timeCalcVar <= 130, timeCalcVar =");
+      Serial.println(timeCalcVar);
+    }
 
     lcd.setCursor(3, 0);
     lcd.print(GAME_TIME_TOP);
@@ -36,7 +48,8 @@ void search() {
     //Check If Game End
     if (minutos - aTime / 60000 == 0 && 59 - ((aTime / 1000) % 60) == 0)failSplash();
     //Serial.println(keypad.getKey());
-    //USED IN PASSWORD GAME
+    
+    //密码布置炸弹
     if ('d' == keypad.getKey() && passwordEnable) {
       lcd.clear();
       lcd.setCursor(2, 0);
@@ -58,7 +71,8 @@ void search() {
       delay(500);
       cls();
     }
-    //Check If Is Activating
+    
+    //长按布置炸弹
     while (defusing && !passwordEnable)
     {
       digitalWrite(GREENLED, LOW);
@@ -71,7 +85,7 @@ void search() {
       while (defusing)
       {
         keypad.getKey();
-                percent = (millis() - xTime) / (ACTIVATESECONDS * 10);
+        percent = (millis() - xTime) / (ACTIVATESECONDS * 10);
                 
         drawBar(percent);
         //check if game time runs out during the disabling
@@ -92,8 +106,6 @@ void search() {
           if (soundEnable)tone(tonepin, alarmTone2, 200);
           digitalWrite(REDLED, LOW);
         }
-
-
 
         if (percent >= 100)
         {
@@ -127,7 +139,6 @@ void destroy() {
     }
 
     //Led Blink
-
     timeCalcVar = (millis() - iTime) % 1000;
     if (timeCalcVar >= 0 && timeCalcVar <= 40)
     {
@@ -140,10 +151,25 @@ void destroy() {
     //Sound
     aTime = millis() - iTime;
     timeCalcVar = (millis() - iTime) % 1000;
-    if (timeCalcVar >= 245 && timeCalcVar <= 255 && minutos - aTime / 60000 < 2 && soundEnable)tone(tonepin, activeTone, largoTono);
-    if (timeCalcVar >= 495 && timeCalcVar <= 510 && minutos - aTime / 60000 < 4 && soundEnable)tone(tonepin, activeTone, largoTono);
-    if (timeCalcVar >= 745 && timeCalcVar <= 760 && minutos - aTime / 60000 < 2 && soundEnable)tone(tonepin, activeTone, largoTono);
-    if ( minutos - aTime / 60000 == 0 && 59 - ((aTime / 1000) % 60) < 10)largoTono = 300;
+    if (timeCalcVar >= 245 && timeCalcVar <= 255 && minutos - aTime / 60000 < 2 && soundEnable)
+    {
+      tone(tonepin, activeTone, largoTono);
+    }
+    
+    if (timeCalcVar >= 495 && timeCalcVar <= 510 && minutos - aTime / 60000 < 4 && soundEnable)
+    {
+      tone(tonepin, activeTone, largoTono);
+    }
+    
+    if (timeCalcVar >= 745 && timeCalcVar <= 760 && minutos - aTime / 60000 < 2 && soundEnable)
+    {
+      tone(tonepin, activeTone, largoTono);
+    }
+    
+    if ( minutos - aTime / 60000 == 0 && 59 - ((aTime / 1000) % 60) < 10)
+    {
+      largoTono = 300;
+    }
 
     lcd.setCursor(1, 0);
     lcd.print(DETONATION_IN);
@@ -233,5 +259,3 @@ void destroy() {
     }
   }
 }
-
-

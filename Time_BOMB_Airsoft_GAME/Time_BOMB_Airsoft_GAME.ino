@@ -59,7 +59,7 @@ char BT_DEFUSER = 'x';   // not implemented
 
 const int REDLED = 11;
 const int GREENLED = 10;
-//const int BLUELED = 12;
+const int YELLOWLED = 13;
 //RELAYPIN
 boolean relayEnable = false;
 const int RELAYPIN = 9;
@@ -213,4 +213,3 @@ void keypadEvent(KeypadEvent key){
     break;
   }
 }
-
