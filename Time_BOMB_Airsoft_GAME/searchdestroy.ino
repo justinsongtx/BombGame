@@ -9,6 +9,10 @@ void search() {
   unsigned long aTime;
   //var='o';
 
+  unsigned long lastTime = millis();
+  bool lastTimeLedIsLow = true;
+  unsigned long timeGap = 1000;
+
   //Starting Game Code
   while (1) { // this is the important code, is a little messy but works good.
 
@@ -17,21 +21,27 @@ void search() {
       failSplash();
     }
 
-    //Code for led blinking
-    timeCalcVar = (millis() - iTime) % 1000;
-    if (timeCalcVar >= 0 && timeCalcVar <= 50)
+    //闪烁灯
+    if ((millis() - lastTime) > timeGap)
     {
-      digitalWrite(GREENLED, HIGH);
-      
-      Serial.print("timeCalcVar >= 0 && timeCalcVar <= 50, timeCalcVar =");
-      Serial.println(timeCalcVar);
+      if (lastTimeLedIsLow)
+      {
+        digitalWrite(GREENLED, HIGH);
+        lastTimeLedIsLow = false;
+        lastTime = millis();
+        Serial.println("----------1");
+      }
+      else
+      {
+        digitalWrite(GREENLED, LOW);
+        lastTimeLedIsLow = true;
+        lastTime = millis();
+        Serial.println("++++++++++2");
+      }
     }
-    else if (timeCalcVar >= 90 && timeCalcVar <= 130)
+    else
     {
-      digitalWrite(GREENLED, LOW);
-      
-      Serial.print("timeCalcVar >= 90 && timeCalcVar <= 130, timeCalcVar =");
-      Serial.println(timeCalcVar);
+      Serial.println("0000000");
     }
 
     lcd.setCursor(3, 0);
@@ -130,6 +140,11 @@ void destroy() {
   unsigned long aTime;
   int largoTono = 50;
 
+  unsigned long lastTime = millis();
+  bool lastTimeLedIsLow = true;
+  unsigned long timeGap = 1000;
+  unsigned long bizzDuration = 150;
+  
   //MAIN LOOP
   while (1) {
 
@@ -138,38 +153,98 @@ void destroy() {
       explodeSplash();
     }
 
-    //Led Blink
-    timeCalcVar = (millis() - iTime) % 1000;
-    if (timeCalcVar >= 0 && timeCalcVar <= 40)
+    //闪烁灯
+    if ((millis() - lastTime) > timeGap)
     {
-      digitalWrite(REDLED, HIGH);
-      if (soundEnable)tone(tonepin, activeTone, largoTono);
+      if (lastTimeLedIsLow)
+      {
+        digitalWrite(REDLED, HIGH);
+        lastTimeLedIsLow = false;
+        lastTime = millis();
+//        Serial.println("----------1");
+        
+        if (soundEnable)
+        {
+          tone(tonepin, activeTone, bizzDuration);
+        }
+      }
+      else
+      {
+        digitalWrite(REDLED, LOW);
+        lastTimeLedIsLow = true;
+        lastTime = millis();
+//        Serial.println("++++++++++2");
+      }
     }
-    if (timeCalcVar >= 180 && timeCalcVar <= 220) {
-      digitalWrite(REDLED, LOW);
+    else
+    {
+//      Serial.println("0000000");
     }
-    //Sound
+
+    //计算剩余时间
+    double currentGameTime = (double)millis() - (double)iTime;
+    double totalGameTime = (double)BOMBMINUTES * 60.0 * 1000.0;
+    double restGameTime = (totalGameTime - currentGameTime);
+
+    //小于30秒时开始递减闪烁和滴滴间隔
+    if (restGameTime < 30 * 1000)
+    {
+      double radio = restGameTime / totalGameTime;
+      unsigned long newGap = 1000.0 * (restGameTime / totalGameTime);
+
+      //边界控制，间隔不能小于滴滴的时常，不然就只能听到一直滴·····
+      if (newGap <= bizzDuration)
+      {
+        newGap = bizzDuration;
+      }
+      timeGap = newGap;
+
+      Serial.print("restGameTime: ");
+      Serial.print(restGameTime);
+      Serial.print(", totalGameTime: ");
+      Serial.print(totalGameTime);
+      Serial.print(",   radio: ");
+      Serial.print(radio);
+      Serial.print(",   newGap: ");
+      Serial.println(newGap);
+    }
+    
+
+    
+
+    
+//    //Led Blink
+//    timeCalcVar = (millis() - iTime) % 1000;
+//    if (timeCalcVar >= 0 && timeCalcVar <= 40)
+//    {
+//      digitalWrite(REDLED, HIGH);
+//      if (soundEnable)tone(tonepin, activeTone, largoTono);
+//    }
+//    if (timeCalcVar >= 180 && timeCalcVar <= 220) {
+//      digitalWrite(REDLED, LOW);
+//    }
+//    //Sound
     aTime = millis() - iTime;
-    timeCalcVar = (millis() - iTime) % 1000;
-    if (timeCalcVar >= 245 && timeCalcVar <= 255 && minutos - aTime / 60000 < 2 && soundEnable)
-    {
-      tone(tonepin, activeTone, largoTono);
-    }
-    
-    if (timeCalcVar >= 495 && timeCalcVar <= 510 && minutos - aTime / 60000 < 4 && soundEnable)
-    {
-      tone(tonepin, activeTone, largoTono);
-    }
-    
-    if (timeCalcVar >= 745 && timeCalcVar <= 760 && minutos - aTime / 60000 < 2 && soundEnable)
-    {
-      tone(tonepin, activeTone, largoTono);
-    }
-    
-    if ( minutos - aTime / 60000 == 0 && 59 - ((aTime / 1000) % 60) < 10)
-    {
-      largoTono = 300;
-    }
+//    timeCalcVar = (millis() - iTime) % 1000;
+//    if (timeCalcVar >= 245 && timeCalcVar <= 255 && minutos - aTime / 60000 < 2 && soundEnable)
+//    {
+//      tone(tonepin, activeTone, largoTono);
+//    }
+//    
+//    if (timeCalcVar >= 495 && timeCalcVar <= 510 && minutos - aTime / 60000 < 4 && soundEnable)
+//    {
+//      tone(tonepin, activeTone, largoTono);
+//    }
+//    
+//    if (timeCalcVar >= 745 && timeCalcVar <= 760 && minutos - aTime / 60000 < 2 && soundEnable)
+//    {
+//      tone(tonepin, activeTone, largoTono);
+//    }
+//    
+//    if ( minutos - aTime / 60000 == 0 && 59 - ((aTime / 1000) % 60) < 10)
+//    {
+//      largoTono = 300;
+//    }
 
     lcd.setCursor(1, 0);
     lcd.print(DETONATION_IN);

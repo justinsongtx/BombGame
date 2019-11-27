@@ -1,7 +1,6 @@
 #include <Wire.h> 
 #include <Keypad.h>
-//#include <LiquidCrystal_I2C.h>
-#include <LiquidCrystal.h>
+#include <LiquidCrystal_I2C.h>
 /*
  Arduino Bomb Pro
  
@@ -16,7 +15,7 @@
  */
 
 //LiquidCrystal_I2C lcd(0x38,16,2);
-LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
+LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // 設定 LCD I2C 位址
 const byte ROWS = 4; //four rows
 const byte COLS = 4; //three columns
 char keys[ROWS][COLS] = {
@@ -29,11 +28,10 @@ char keys[ROWS][COLS] = {
   {'*','0','#','d'}
 };
 
-byte rowPins[ROWS] = {
-  12, 13, A5, A4}; //connect to the row pinouts of the keypad
-byte colPins[COLS] = {
-  A3, A2, A1, A0
-}; //connect to the column pinouts of the keypad
+byte rowPins[ROWS] = {2, 3, 4, 5}; //connect to the row pinouts of the keypad
+byte colPins[COLS] = {6, 7, 8, 9}; //connect to the column pinouts of the keypad
+
+
 
 Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS );
 
@@ -57,9 +55,9 @@ char BT_DEFUSER = 'x';   // not implemented
 
 //leds
 
-const int REDLED = 11;
+const int REDLED = 12;
+const int YELLOWLED = 11;
 const int GREENLED = 10;
-const int YELLOWLED = 13;
 //RELAYPIN
 boolean relayEnable = false;
 const int RELAYPIN = 9;
@@ -82,7 +80,7 @@ boolean defusing;
 boolean cancelando;
 // SOUND TONES
 boolean soundEnable = true;
-int tonepin = 8; // Pin 13 for the sound
+int tonepin = 13; // Pin 13 for the sound
 int alarmTone1 = 700;
 int alarmTone2 = 2600;
 int activeTone = 1330;
@@ -107,6 +105,8 @@ void setup(){
   keypad.setDebounceTime(50);
   keypad.addEventListener(keypadEvent);
 
+  Serial.print("start");
+  
   //PinModes
   pinMode(GREENLED, OUTPUT);     
   pinMode(REDLED, OUTPUT); 
