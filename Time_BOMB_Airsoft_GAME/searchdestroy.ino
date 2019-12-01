@@ -209,43 +209,7 @@ void destroy() {
       Serial.println(newGap);
     }
     
-
-    
-
-    
-//    //Led Blink
-//    timeCalcVar = (millis() - iTime) % 1000;
-//    if (timeCalcVar >= 0 && timeCalcVar <= 40)
-//    {
-//      digitalWrite(REDLED, HIGH);
-//      if (soundEnable)tone(tonepin, activeTone, largoTono);
-//    }
-//    if (timeCalcVar >= 180 && timeCalcVar <= 220) {
-//      digitalWrite(REDLED, LOW);
-//    }
-//    //Sound
     aTime = millis() - iTime;
-//    timeCalcVar = (millis() - iTime) % 1000;
-//    if (timeCalcVar >= 245 && timeCalcVar <= 255 && minutos - aTime / 60000 < 2 && soundEnable)
-//    {
-//      tone(tonepin, activeTone, largoTono);
-//    }
-//    
-//    if (timeCalcVar >= 495 && timeCalcVar <= 510 && minutos - aTime / 60000 < 4 && soundEnable)
-//    {
-//      tone(tonepin, activeTone, largoTono);
-//    }
-//    
-//    if (timeCalcVar >= 745 && timeCalcVar <= 760 && minutos - aTime / 60000 < 2 && soundEnable)
-//    {
-//      tone(tonepin, activeTone, largoTono);
-//    }
-//    
-//    if ( minutos - aTime / 60000 == 0 && 59 - ((aTime / 1000) % 60) < 10)
-//    {
-//      largoTono = 300;
-//    }
-
     lcd.setCursor(1, 0);
     lcd.print(DETONATION_IN);
     //Passed Time

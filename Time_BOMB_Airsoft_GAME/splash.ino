@@ -20,7 +20,7 @@ void explodeSplash(){
 
   //匪徒赢了，亮红灯，播音乐
   digitalWrite(REDLED, HIGH);  
-  for(int i = 200; i>0; i--)// this is the ultra hi definition explosion sound xD
+  for(int i = 3000; i>2700; i--)// this is the ultra hi definition explosion sound xD
   {
     tone(tonepin,i);
     delay(20);
@@ -92,7 +92,7 @@ void failSplash()
 
   //超时，亮黄灯，播音乐
   digitalWrite(YELLOWLED, HIGH);
-  for(int i = 200; i>0; i--)// this is the ultra hi definition explosion sound xD
+  for(int i = 3000; i>2700; i--)// this is the ultra hi definition explosion sound xD
   {
     tone(tonepin,i);
     delay(20);

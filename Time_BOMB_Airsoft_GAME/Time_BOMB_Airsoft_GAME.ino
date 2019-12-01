@@ -53,11 +53,11 @@ char BT_SEL = 'd';   // Ok key
 char BT_CANCEL = 'c';
 char BT_DEFUSER = 'x';   // not implemented
 
-//leds
 
-const int REDLED = 12;
+const int REDLED = 10;
 const int YELLOWLED = 11;
-const int GREENLED = 10;
+const int GREENLED = 12;
+//leds
 //RELAYPIN
 boolean relayEnable = false;
 const int RELAYPIN = 9;
@@ -83,7 +83,7 @@ boolean soundEnable = true;
 int tonepin = 13; // Pin 13 for the sound
 int alarmTone1 = 700;
 int alarmTone2 = 2600;
-int activeTone = 1330;
+int activeTone = 2660;
 int errorTone = 100;
 
 unsigned long iTime;
@@ -109,7 +109,9 @@ void setup(){
   
   //PinModes
   pinMode(GREENLED, OUTPUT);     
-  pinMode(REDLED, OUTPUT); 
+  pinMode(REDLED, OUTPUT);
+  pinMode(YELLOWLED, OUTPUT);
+   
   pinMode(RELAYPIN, OUTPUT);  
   // CONFIGURE THE BARS OF PROGRESS BAR
   byte bar1[8] = {
