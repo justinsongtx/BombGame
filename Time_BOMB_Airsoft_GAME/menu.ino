@@ -118,11 +118,11 @@ void config(){
       case 2:
         cls();
         lcd.print("RELAYPIN ON!");
-        digitalWrite(RELAYPIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+//        digitalWrite(RELAYPIN, HIGH);   // turn the LED on (HIGH is the voltage level)
         delay(4000);   // wait for 4 second
         cls();
         lcd.print("RELAYPIN OFF!");
-        digitalWrite(RELAYPIN, LOW);
+//        digitalWrite(RELAYPIN, LOW);
         delay(2000);
         config();
         break;        
@@ -356,9 +356,3 @@ void configQuickGame(){
   }  
   //Continue the game :D
 }
-
-
-
-
-
-

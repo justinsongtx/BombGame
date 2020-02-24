@@ -20,12 +20,18 @@ void explodeSplash(){
 
   //匪徒赢了，亮红灯，播音乐
   digitalWrite(REDLED, HIGH);  
-  for(int i = 3000; i>2700; i--)// this is the ultra hi definition explosion sound xD
-  {
-    tone(tonepin,i);
-    delay(20);
-  }
-  noTone(tonepin);
+
+  Serial.println("Terrorist Win");
+  playSound(ResultFoler, TerroristWin);
+  delay(2000);
+  playSoundRandom(CheerFolder);
+  delay(1000);
+//  for(int i = 3000; i>2700; i--)// this is the ultra hi definition explosion sound xD
+//  {
+//    tone(tonepin,i);
+//    delay(20);
+//  }
+//  noTone(tonepin);
 
   //按键之后，停音乐关红灯
   keypad.waitForKey();
@@ -92,12 +98,16 @@ void failSplash()
 
   //超时，亮黄灯，播音乐
   digitalWrite(YELLOWLED, HIGH);
-  for(int i = 3000; i>2700; i--)// this is the ultra hi definition explosion sound xD
-  {
-    tone(tonepin,i);
-    delay(20);
-  }
-  noTone(tonepin);
+
+  Serial.println("Time Out");
+  playSoundRandom(CheerFolder);
+  delay(1000);
+//  for(int i = 3000; i>2700; i--)// this is the ultra hi definition explosion sound xD
+//  {
+//    tone(tonepin,i);
+//    delay(20);
+//  }
+//  noTone(tonepin);
   
   //按键之后，停音乐关黄灯
   keypad.waitForKey();
@@ -158,6 +168,12 @@ void disarmedSplash()
     lcd.setCursor(0,1);
     lcd.print("Push ANY Button");
     digitalWrite(GREENLED, HIGH);  
+
+    Serial.println("Counter Terrorist Win");
+    playSound(ResultFoler, CounterTerroristWin);
+    delay(2000);
+    playSoundRandom(CheerFolder);
+    delay(1000);
     keypad.waitForKey();
     tone(tonepin,2400,30);
     digitalWrite(GREENLED, LOW); 

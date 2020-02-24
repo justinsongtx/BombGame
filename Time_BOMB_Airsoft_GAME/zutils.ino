@@ -135,9 +135,17 @@ void startGameCount(){
     tone(tonepin,2000,100);
     lcd.print("IN ");
     lcd.print(i);
+
+    if (i == 1)
+    {
+      playSoundRandom(GoGoGoFolder);
+    }
     delay(1000);
   }
   cls();
+
+//  playSoundRandom(GoGoGoFolder);
+//  delay(1000);
 }
 
 void checkArrows(byte i,byte maxx ){
@@ -160,10 +168,8 @@ void checkArrows(byte i,byte maxx ){
 
 void activateRelay(){
 
-  digitalWrite(RELAYPIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(RELAY_TIME); 
-  digitalWrite(RELAYPIN, LOW);
+//  digitalWrite(RELAYPIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+//  delay(RELAY_TIME); 
+//  digitalWrite(RELAYPIN, LOW);
 
 }
-
-

@@ -45,13 +45,13 @@ char var;
 boolean passwordEnable=false;
 
 //Buttons for lcd shield
-char BT_RIGHT = '4';
+//char BT_RIGHT = '4';
 char BT_UP = 'a';
 char BT_DOWN = 'b';
-char BT_LEFT = '6';
+//char BT_LEFT = '6';
 char BT_SEL = 'd';   // Ok key  
 char BT_CANCEL = 'c';
-char BT_DEFUSER = 'x';   // not implemented
+//char BT_DEFUSER = 'x';   // not implemented
 
 
 const int REDLED = 10;
@@ -60,7 +60,7 @@ const int GREENLED = 12;
 //leds
 //RELAYPIN
 boolean relayEnable = false;
-const int RELAYPIN = 9;
+//const int RELAYPIN = 9;
 //IS VERY IMPORTANT THAT YOU TEST THIS TIME. BY DEFAULT IS IN 1 SEC. THAT IS NOT TOO MUCH. SO TEST IT!
 const int RELAY_TIME = 5000;
 
@@ -76,7 +76,7 @@ boolean sdStatus = false; //search and destroy game enable used in config
 boolean saStatus = false; //same but SAbotaghe
 boolean doStatus = false; //for DEmolition
 boolean start = true;
-boolean defusing;
+boolean defusing = false;
 boolean cancelando;
 // SOUND TONES
 boolean soundEnable = true;
@@ -96,10 +96,10 @@ byte team=0; // 0 = neutral, 1 = green team, 2 = red team
 void setup(){
   lcd.begin(16, 2);
   Serial.begin(9600);
-  lcd.setCursor(3,0);
+//  lcd.setCursor(3,0);
   tone(tonepin,2400,30);
-  lcd.print("BLUECORE TECH");// you can add your team name or someting cool
-  lcd.setCursor(0,1);
+//  lcd.print("BLUECORE TECH");// you can add your team name or someting cool
+  lcd.setCursor(0,0);
   lcd.print(" AIRSOFT BOMB");// you can add your team name or someting cool
   keypad.setHoldTime(50);
   keypad.setDebounceTime(50);
@@ -112,7 +112,7 @@ void setup(){
   pinMode(REDLED, OUTPUT);
   pinMode(YELLOWLED, OUTPUT);
    
-  pinMode(RELAYPIN, OUTPUT);  
+//  pinMode(RELAYPIN, OUTPUT);  
   // CONFIGURE THE BARS OF PROGRESS BAR
   byte bar1[8] = {
     B10000,
@@ -190,6 +190,8 @@ void setup(){
   lcd.createChar(4,bar5);
   lcd.createChar(5,up);
   lcd.createChar(6,down);
+
+  setupMusic();
 }
 
 void loop(){
@@ -199,7 +201,11 @@ void keypadEvent(KeypadEvent key){
   switch (keypad.getState()){
     case RELEASED:
       switch (key){
-         case 'd': defusing=false;
+         case 'd': 
+         {
+          defusing=false;
+          Serial.print("set defusing false");
+         }
          break;
          case 'c': cancelando=false;
          break;
@@ -207,7 +213,11 @@ void keypadEvent(KeypadEvent key){
     break;
     case HOLD:
       switch (key){
-        case 'd': defusing= true;
+        case 'd': 
+        {
+          defusing= true;
+          Serial.print("set defusing true");
+        }
         break;
         case 'c': cancelando=true;
         break;

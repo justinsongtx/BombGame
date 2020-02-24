@@ -1,5 +1,6 @@
 void search() {
   refresh = true;
+  defusing = false;
   cls();
   digitalWrite(REDLED, LOW);
   digitalWrite(GREENLED, LOW);
@@ -12,7 +13,12 @@ void search() {
   unsigned long lastTime = millis();
   bool lastTimeLedIsLow = true;
   unsigned long timeGap = 1000;
-
+  
+  
+//  Serial.println("Go Go Go");
+//  playSoundRandom(GoGoGoFolder);
+//  delay(1000);
+  
   //Starting Game Code
   while (1) { // this is the important code, is a little messy but works good.
 
@@ -29,19 +35,19 @@ void search() {
         digitalWrite(GREENLED, HIGH);
         lastTimeLedIsLow = false;
         lastTime = millis();
-        Serial.println("----------1");
+//        Serial.println("----------1");
       }
       else
       {
         digitalWrite(GREENLED, LOW);
         lastTimeLedIsLow = true;
         lastTime = millis();
-        Serial.println("++++++++++2");
+//        Serial.println("++++++++++2");
       }
     }
     else
     {
-      Serial.println("0000000");
+//      Serial.println("0000000");
     }
 
     lcd.setCursor(3, 0);
@@ -70,10 +76,16 @@ void search() {
       lcd.print(ENTER_CODE);
 
       setCodeTime();// we need to set the comparation variable first it writes on codeInput[]
-
+      
       //then compare :D
 
-      if (comparePassword()) destroy();
+      if (comparePassword()) 
+      {
+        Serial.println("Boom Has Been Planed");
+        playSound(BoomDefFolder, BoomHasBeenPlaned);
+        destroy();
+      }
+      
       lcd.clear();
       lcd.setCursor(3, 0);
       lcd.print(CODE_ERROR);
@@ -81,10 +93,13 @@ void search() {
       delay(500);
       cls();
     }
+
     
     //长按布置炸弹
     while (defusing && !passwordEnable)
     {
+      Serial.print("defusing:");
+      Serial.println(defusing);
       digitalWrite(GREENLED, LOW);
       lcd.clear();
       lcd.setCursor(2, 0);
@@ -119,13 +134,16 @@ void search() {
 
         if (percent >= 100)
         {
+          Serial.println("Boom Has Been Planed");
+          playSound(BoomDefFolder, BoomHasBeenPlaned);
+          
           digitalWrite(GREENLED, LOW);
           destroy();// jump to the next gamemode
         }
       }
       cls();
       digitalWrite(REDLED, LOW);
-
+     
     }
   }
 }
@@ -246,13 +264,16 @@ void destroy() {
 
       //then compare :D
 
-      if (comparePassword()) {
+      if (comparePassword()) 
+      {
+        Serial.println("Boom Has Been Defuse");
+        playSound(BoomDefFolder, BoomHasBeenDefuse);
+        delay(1000);
         disarmedSplash();
       }
       lcd.clear();
       lcd.setCursor(3, 0);
       lcd.print(CODE_ERROR);
-      if (soundEnable)tone(tonepin, errorTone, 200);
       delay(500);
       cls();
     }
@@ -290,7 +311,13 @@ void destroy() {
         drawBar(percent);
 
         //BOMB DISARMED GAME OVER
-        if (percent >= 100)disarmedSplash();
+        if (percent >= 100)
+        {
+          Serial.println("Boom Has Been Defuse");
+          playSound(BoomDefFolder, BoomHasBeenDefuse);
+          delay(2000);
+          disarmedSplash();
+        }
       }
       digitalWrite(REDLED, LOW);
       digitalWrite(GREENLED, LOW);
