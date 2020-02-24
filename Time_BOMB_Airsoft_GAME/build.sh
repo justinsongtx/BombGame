@@ -1,305 +1,124 @@
-void domination(){
+#!/bin/bash
+rm -rf result
+mkdir -p result
+echo "PUB_HOSTED_URL: "$PUB_HOSTED_URL
+echo "FLUTTER_STORAGE_BASE_URL: "$FLUTTER_STORAGE_BASE_URL
+echo $PWD
+echo "###################################################################################################################"
+echo "Flutter Build start ..."
+flutter --version
 
-  //SETUP INITIAL TIME 
-  int minutos = GAMEMINUTES-1;
-  boolean showGameTime=true;
-  unsigned long a;
-  unsigned long iTime=millis(); //  initialTime in millisec 
-  unsigned long aTime;
- 
-  team=0;
-  iZoneTime=0;
-  aTime=0;
-  redTime=0;
-  greenTime=0;
+# 解除 Flutter 构建锁
+lockFile="$FLUTTER_ROOT/bin/cache/lockfile"
+#lockFile="/Users/elvissu/Documents/日常学习/flutter/bin/cache/lockfile"
+if [[ -a "$lockFile" ]]; then
+echo "存在lockfile文件";
+rm -f "$lockFile"
+fi
 
-  int largoTono = 50;
-  // 0 = neutral, 1 = green team, 2 = red team
-  a=millis();
-  //Starting Game Code
-  while(1)  // this is the important code, is a little messy but works good.
-  {
-    if(endGame){
-      gameOver();
-    }
+pubCache="/Users/bkdevops/.pub-cache"
+rm -rf "$pubCache"
+
+echo "prepare end.........."
+
+# 生成版本号
+appVersion=$MajorVersion"."$MinorVersion"."$FixVersion
+echo "App Version: "$appVersion
+
+appBuildNumber=$BuildNo
+echo "App Build Number: "$appBuildNumber
+
+echo "###################################################################################################################"
+echo "Start build iOS App"
+
+function buildAppleTarget() {
     
-    keypad.getKey();
-    aTime=millis()- iTime;
-    //Code for led blinking
-    timeCalcVar=(millis()- iTime)%1000;
-    if(timeCalcVar >= 0 && timeCalcVar <= 40)
-    {
-      if(team==1)digitalWrite(GREENLED, HIGH);  
-      if(team==2)digitalWrite(REDLED, HIGH);  
-    }
-    if(timeCalcVar >= 50 && timeCalcVar <= 100)
-    {    
-      if(team==1)digitalWrite(GREENLED, LOW);  
-      if(team==2)digitalWrite(REDLED, LOW);
-    }
-    // Sound!!! same as Destroy 
-    if(timeCalcVar >= 0 && timeCalcVar <= 40 && soundEnable)tone(tonepin,activeTone,largoTono);
+    _version=$1
+    _buildNumber=$2
+    _buildTarget=$3
+    _targetFile=$4
 
-    if(timeCalcVar >= 245 && timeCalcVar <= 255 && minutos-aTime/60000<2 && soundEnable)tone(tonepin,activeTone,largoTono);
-    if(timeCalcVar >= 495 && timeCalcVar <= 510 && minutos-aTime/60000<4 && soundEnable)tone(tonepin,activeTone,largoTono);
-    if(timeCalcVar >= 745 && timeCalcVar <= 760 && minutos-aTime/60000<2 && soundEnable)tone(tonepin,activeTone,largoTono);
-    //Help to count 3 secs
-    if(a+2000<millis()){
-      a=millis();   
-      showGameTime=!showGameTime;
-      cls();
-    }
-    //THE NEXT TO METHODS SHOW "GAME TIME" AND "CONTROLED ZONE TIME" IT SHOWS 2 AND 2 SEC EACH
+    # 设置版本号
+    echo "Start Version Settting"
+    app_info_plist_path="ios/Runner/Info.plist"
+    /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${appBuildNumber}" ${app_info_plist_path}
+    /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${appVersion}" ${app_info_plist_path}
+    echo "End Version Settting"
 
-    if(showGameTime){ //THE SECOND IS /2
-      lcd.setCursor(3,0);
-      lcd.print("GAME TIME");
-      lcd.setCursor(3,1);
-      printTime(minutos, aTime);
-    }
-    else if (!showGameTime){
+    # 开始构建
+    flutter build ios --build-name=$_version --build-number=$_buildNumber --release $_targetFile
 
-      lcd.setCursor(2,0);
-      if(team == 0)lcd.print("NEUTRAL ZONE");
-      if(team == 1)lcd.print(" GREEN ZONE");
-      if(team == 2)lcd.print("  RED ZONE");
+    # 生成 .ipa 文件
+    rm -rf build/ios/iphoneos/ipa/
+    mkdir -p build/ios/iphoneos/ipa/Payload
+    cp -R build/ios/iphoneos/Runner.app build/ios/iphoneos/ipa/Payload/
+    cd build/ios/iphoneos/ipa
+    zip -r app-release.ipa Payload
 
-      if(team>0){
-        lcd.setCursor(3,1);
-        printTimeDom(millis()-iZoneTime,true);
-      }
-    }
+    _appName="app-release-codesign"
 
-    //###########################CHECKINGS##################
+    cd ../../../../
+    echo $PWD
 
-    //Check If Game End
-    if(minutos-aTime/60000==0 && 59-((aTime/1000)%60)==0)
-    {
-      gameOver();
-    }
-
-    //Check If IS neutral
-    while((defusing || cancelando) && team > 0)
-    {
-      cls();
-      if(team>0)lcd.print("NEUTRALIZING...");
-      lcd.setCursor(0,1);
-      unsigned int percent=0;
-      unsigned long xTime=millis(); //start disabling time
-      while(defusing || cancelando)
-      {
-        //check if game time runs out during the disabling
-        aTime= millis()- iTime;
-        if((minutos-aTime/60000==0 && 59-((aTime/1000)%60)==0) || minutos-aTime/60000>4000000000){ 
-          endGame = true;
-        }
-        
-        keypad.getKey();
-        timeCalcVar = (millis()- xTime)%1000;
-
-        if( timeCalcVar >= 0 && timeCalcVar <= 20)
-        {
-          if(soundEnable)tone(tonepin,alarmTone1,200);
-        }
-        if(timeCalcVar >= 480 && timeCalcVar <= 500)
-        {
-          if(soundEnable)tone(tonepin,alarmTone2,200);
-          digitalWrite(REDLED, LOW);
-        }
-
-        unsigned long seconds= millis() - xTime;
-        percent = (seconds)/(ACTIVATESECONDS*10);
-        drawBar(percent);
-
-        if(percent >= 100)
-        {
-          delay(1000);
-
-          if(team==1){ 
-            greenTime+=millis()-iZoneTime;
-            iZoneTime=0; 
-
-          }
-          if(team==2){ 
-            redTime+=millis()-iZoneTime;
-            iZoneTime=0; 
-          }
-          team=0;
-          break;
-        }
-      }
-      cls();
-    }
-
-    //Capturing red
-
-    while(defusing && team == 0 )
-    {
-      cls();
-      if(team==0)lcd.print(" CAPTURING ZONE");
-      lcd.setCursor(0,1);
-      unsigned int percent=0;
-      unsigned long xTime=millis(); //start disabling time
-      while(defusing)
-      {
-        keypad.getKey();
-        //check if game time runs out during the disabling
-        aTime= millis()- iTime;
-        if((minutos-aTime/60000==0 && 59-((aTime/1000)%60)==0) || minutos-aTime/60000>4000000000){ 
-          endGame = true;
-        }
-        timeCalcVar = (millis()- xTime)%1000;
-
-        if( timeCalcVar >= 0 && timeCalcVar <= 20)
-        {
-          digitalWrite(REDLED, HIGH);  
-          if(soundEnable)tone(tonepin,alarmTone1,200);
-        }
-        if(timeCalcVar >= 480 && timeCalcVar <= 500)
-        {
-          if(soundEnable)tone(tonepin,alarmTone2,200);
-          digitalWrite(REDLED, LOW);
-        }
-
-        unsigned long seconds= millis() - xTime;
-        percent = (seconds)/(ACTIVATESECONDS*10);
-        drawBar(percent);
-
-        if(percent >= 100)
-        {
-          digitalWrite(GREENLED, LOW);
-          team=2;
-          iZoneTime=millis();
-          delay(1000);
-          break;
-        }
-      }
-      cls();
-      digitalWrite(REDLED, LOW);
-    }
-
-    //getting to green zone
-    while(cancelando && team == 0 )
-    {
-      cls();
-      if(team==0)lcd.print(" CAPTURING ZONE");
-      lcd.setCursor(0,1);
-      unsigned int percent=0;
-      unsigned long xTime=millis(); //start disabling time
-      while(cancelando)
-      {
-        keypad.getKey();
-        //check if game time runs out during the disabling
-        aTime= millis()- iTime;
-        if((minutos-aTime/60000==0 && 59-((aTime/1000)%60)==0) || minutos-aTime/60000>4000000000){ 
-          endGame = true;
-        }
-        timeCalcVar = (millis()- xTime)%1000;
-
-        if( timeCalcVar >= 0 && timeCalcVar <= 20)
-        {
-          digitalWrite(GREENLED, HIGH);  
-          if(soundEnable)tone(tonepin,alarmTone1,200);
-        }
-        if(timeCalcVar >= 480 && timeCalcVar <= 500)
-        {
-          if(soundEnable)tone(tonepin,alarmTone2,200);
-          digitalWrite(GREENLED, LOW);
-        }
-
-        unsigned long seconds= millis() - xTime;
-        percent = (seconds)/(ACTIVATESECONDS*10);
-        drawBar(percent);
-
-        if(percent >= 100)
-        {
-          digitalWrite(GREENLED, LOW);
-          team=1;
-          iZoneTime=millis();
-          delay(1000);
-          break;
-        }
-      }
-      cls();
-      digitalWrite(GREENLED, LOW);  
-    }
-  }
+    #if [[ $LANDUN ]]
+    #then
+    # 拷贝到输出结果目录
+    #cp build/ios/iphoneos/ipa/app-release.ipa result/k12hd-$_buildTarget-$_version"."$_buildNumber".ipa"
+    #cp build/ios/iphoneos/ipa/"$_appName".ipa result/aieducation-$_buildTarget-$_version"."$_buildNumber".sign.ipa"
+    #else
+    # 拷贝到输出结果目录
+    #cp build/ios/iphoneos/ipa/app-release.ipa $WORKSPACE/result/k12hd-$_buildTarget-$_version"."$_buildNumber".ipa"
+    #cp build/ios/iphoneos/ipa/"$_appName".ipa $WORKSPACE/result/k12hd-$_buildTarget-$_version"."$_buildNumber".sign.ipa"
+    #fi
+    cp build/ios/iphoneos/ipa/app-release.ipa output/caige-$_version.$_buildNumber-release.ipa
+    
+    echo "copy release ipa done"
 }
 
-void gameOver(){
+setEnv "commit" "$(git log -1 --oneline)"
+setEnv "author" "$(git log -1 --pretty=%aN)"
+# setEnv "qua" ${QUA}
 
-  if(team==1)greenTime+=millis()-iZoneTime;
-  if(team==2)redTime+=millis()-iZoneTime;
-  digitalWrite(GREENLED, LOW);
-  digitalWrite(REDLED, LOW);
-  while(!defusing){
-    keypad.getKey();
-    if(defusing){
-      keypad.getKey();
-      break;
-    }
-    lcd.clear();
-    lcd.setCursor(3,0);
-    lcd.print("TIME OVER!");
-    lcd.setCursor(0,1);
-
-    //check who team win the base
-    if(greenTime>redTime){
-      //greenteam wins
-      lcd.print(" GREEN TEAM WINS");
-      digitalWrite(GREENLED, HIGH);
-    }
-    else{
-      //redteam wins 
-      lcd.print("  RED TEAM WINS");
-      digitalWrite(REDLED, HIGH);
-    }
-    delay(3000);
-    keypad.getKey();
-    if(defusing){
-      keypad.getKey();
-      break;
-    }
-    cls();
-    lcd.print("Red Time:");
-    lcd.setCursor(5,1);
-    printTimeDom(redTime,false);
-    delay(3000);
-    keypad.getKey();
-    if(defusing){
-      
-      break;
-    }
-    cls();
-    lcd.print("Green Time:");
-    lcd.setCursor(5,1);
-    printTimeDom(greenTime,false);
-    delay(3000);
-    keypad.getKey();
-    if(defusing){
-      keypad.getKey();
-      break;
-    }
-  }
-  cls();
-  delay(100);
-  lcd.print("Play Again?");
-  lcd.setCursor(0,1);
-  lcd.print("A : Yes B : No");
-  while(1)
-  {
-    var = keypad.waitForKey();
-    if(var == 'a' ){
-      tone(tonepin,2400,30);
-      cls();
-      domination();
-      break;
-    }  
-    if(var == 'b' ){
-      tone(tonepin,2400,30);
-      menuPrincipal();
-      break;
-    }  
-  } 
+function writeConfig() {
+    echo "{\"isProduction\":${isProduction}, \"QUAVer\": \"${QUAVer}\", \"QUAPlatform_BusinessId\": \"${QUAPlatform_BusinessId}\", \"QUAAppVersion\": \"${appVersion}\", \"QUABuildNo\": \"${BuildNo}\", \"QUAChannel\": \"${QUAChannel}\"" > config.json
 }
 
+writeConfig
+
+#----------------------
+# 功能：修改编译参数
+# ----------------------
+function writeBuildDefine() {
+    echo "
+#ifndef BuildDefine_h
+#define BuildDefine_h
+
+//是否为正式版
+#define isProduction ${isProduction}
+
+//QUA版本号
+#define QUAVer @\"${QUAVer}\"
+
+//平台信息+业务
+#define QUAPlatform_BusinessId  @\"${QUAPlatform_BusinessId}\"
+
+//渠道号
+#define QUAChannel @\"${QUAChannel}\"
+
+#endif /* BuildDefine_h */
+" > ./ios/Runner/BuildDefine.h
+}
+
+writeBuildDefine
+
+buildAppleTarget $appVersion $appBuildNumber $buildTarget $targetFile
+
+#if [[ $buildTarget == DailyBuild ]]; then
+#    # 在iPhone版的RDM中只能生成iPad的测试包，发布包必须在iPad的RDM中生成，为了避免混乱，只在测试包时生成iPad包。
+#    buildAppleTarget $appVersion $appBuildNumber iPad "--target=lib/ipad.dart"
+#fi
+
+echo "###################################################################################################################"
+echo "Build Finish"
+echo "###################################################################################################################"
+exit 0
